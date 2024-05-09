@@ -11,6 +11,8 @@
 fastapi
 starlette
 uvicorn[standard]
+lsst.resources
+rubin_scheduler
 
 # Other dependencies.
 pydantic

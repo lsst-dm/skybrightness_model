@@ -15,10 +15,12 @@ from fastapi import FastAPI
 from safir.dependencies.http_client import http_client_dependency
 from safir.logging import configure_logging, configure_uvicorn_logging
 from safir.middleware.x_forwarded import XForwardedMiddleware
+from safir.models import ErrorModel
 
 from .config import config
 from .handlers.external import external_router
 from .handlers.internal import internal_router
+from .handlers.skybrightness import skybrightness_router
 
 __all__ = ["app", "config"]
 
@@ -55,6 +57,16 @@ app = FastAPI(
 # Attach the routers.
 app.include_router(internal_router)
 app.include_router(external_router, prefix=f"{config.path_prefix}")
+app.include_router(
+    skybrightness_router,
+    prefix=f"{config.path_prefix}/skybrightness",
+    # Common errors are modelled around Safir's ErrorModel class, so we can
+    # set that here for all endpoints on this router.
+    responses={
+        404: {"description": "Not found", "model": ErrorModel},
+    },
+)
+
 
 # Add middleware.
 app.add_middleware(XForwardedMiddleware)
